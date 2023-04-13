@@ -1,21 +1,18 @@
 import React, { useDebugValue, useEffect, useState } from "react";
+import classnames from "classnames";
 import style from "./Card.module.css";
 
 const Card = (props) => {
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  const flip = () => {
-    setIsFlipped(!isFlipped);
-  };
-
   const handleClick = (e) => {
-    flip();
-    props.handleTurn(props.index);
+    if (!props.isFlipped) props.handleTurn(props.index);
   };
 
   return (
     <button
-      className={isFlipped ? style.card : style.card + " " + style.hover}
+      className={classnames(style.card, {
+        [style.hover]: !props.isFlipped,
+        [style.hide]: props.isFound,
+      })}
       onClick={handleClick}
     >
       <div className={style.flipper}>

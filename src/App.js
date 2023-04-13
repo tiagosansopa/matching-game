@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Table from "./UI/Table";
 import Nav from "./UI/Nav";
+import Card from "./UI/Card";
 
 const DUMMY_CARDS = [
   {
@@ -37,11 +38,10 @@ const DUMMY_CARDS = [
 
 const App = () => {
   const [cards, setCards] = useState(DUMMY_CARDS);
-
   const [cardDeck, setCardDeck] = useState([]);
   const [score, setScore] = useState(0);
   const [openCard, setOpenCard] = useState([]);
-  const [foundMatches, setFoundMatches] = useState([]);
+  const [foundMatches, setFoundMatches] = useState({});
 
   const timer = useRef(null);
 
@@ -55,13 +55,22 @@ const App = () => {
     }
     setCardDeck(deck);
     setScore(0);
+    setOpenCard([]);
+    setFoundMatches([]);
   };
+
+  const flipAll = () => {};
+
+  const showAll = () => {};
 
   const compareCards = () => {
     const [firstCard, secondCard] = openCard;
     if (cardDeck[firstCard].id === cardDeck[secondCard].id) {
+      setFoundMatches((prev) => ({ ...prev, [cardDeck[firstCard].id]: true }));
       setOpenCard([]);
-      console.log("Encontradas");
+      console.log("Match!");
+      setScore(score + 1);
+      console.log(foundMatches);
       return;
     } else {
       timer.current = setTimeout(() => {
@@ -70,14 +79,31 @@ const App = () => {
     }
   };
 
+  const checkWin = () => {
+    if (Object.keys(foundMatches).length === cards.length) {
+      console.log("YOU WON");
+    }
+  };
+
+  const checkFlipped = (index) => {
+    return openCard.includes(index);
+  };
+
+  const checkFound = (card) => {
+    return Boolean(foundMatches[card.id]);
+  };
+
   const checkTurn = (card) => {
     if (openCard.length === 1) {
       setOpenCard((prev) => [...prev, card]);
     } else {
       setOpenCard([card]);
     }
-    console.log(openCard);
   };
+
+  useEffect(() => {
+    checkWin();
+  }, [foundMatches]);
 
   useEffect(() => {
     let timer = null;
@@ -97,7 +123,20 @@ const App = () => {
   return (
     <div>
       <Nav handleShuffle={suffleCards} cards={cards} score={score} />
-      <Table cards={cardDeck} handleTurn={checkTurn}></Table>
+      <Table>
+        {cardDeck.map((card, index) => {
+          return (
+            <Card
+              key={index}
+              index={index}
+              card={card}
+              handleTurn={checkTurn}
+              isFlipped={checkFlipped(index)}
+              isFound={checkFound(card)}
+            />
+          );
+        })}
+      </Table>
     </div>
   );
 };

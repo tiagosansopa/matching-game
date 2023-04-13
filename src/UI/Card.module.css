@@ -13,6 +13,10 @@
   -webkit-transition: all 0.1s;
 }
 
+.hide {
+  visibility: hidden;
+}
+
 .card.hover .flipper {
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
