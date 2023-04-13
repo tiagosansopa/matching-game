@@ -6,12 +6,13 @@ const Table = (props) => {
   return (
     <div className={styles["table-container"]}>
       <div className={styles["table"]}>
-        {props.cards.map((card) => {
+        {props.cards.map((card, index) => {
           return (
             <Card
-              path={card.src + card.id + card.ext}
+              key={index}
+              index={index}
               card={card}
-              checkTurn={props.checkTurn}
+              handleTurn={props.handleTurn}
             />
           );
         })}

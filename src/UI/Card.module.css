@@ -51,7 +51,7 @@
   border-radius: 5px;
 }
 
-.back > img {
+.front > img {
   height: 100px;
   width: 100px;
   object-fit: scale-down;

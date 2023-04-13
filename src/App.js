@@ -1,82 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Table from "./UI/Table";
 import Nav from "./UI/Nav";
 
 const DUMMY_CARDS = [
   {
     id: 0,
-    src: "../assets/images/",
+    src: require(`./assets/images/0.jpg`),
     letter: "A",
     ext: ".jpg",
   },
   {
     id: 1,
-    src: "../assets/images/",
+    src: require(`./assets/images/1.jpg`),
     letter: "B",
     ext: ".jpg",
   },
   {
     id: 2,
-    src: "../assets/images/",
+    src: require(`./assets/images/2.jpg`),
     letter: "C",
     ext: ".jpg",
   },
   {
     id: 3,
-    src: "../assets/images/",
+    src: require(`./assets/images/3.jpeg`),
     letter: "D",
     ext: ".jpeg",
   },
   {
     id: 4,
-    src: "../assets/images/",
+    src: require(`./assets/images/4.jpg`),
     letter: "E",
-    ext: ".jpg",
-  },
-  {
-    id: 5,
-    src: "../assets/images/",
-    letter: "F",
-    ext: ".jpg",
-  },
-  {
-    id: 6,
-    src: "../assets/images/",
-    letter: "G",
-    ext: ".jpg",
-  },
-  {
-    id: 7,
-    src: "../assets/images/",
-    letter: "H",
-    ext: ".jpg",
-  },
-  {
-    id: 8,
-    src: "../assets/images/",
-    letter: "I",
-    ext: ".jpg",
-  },
-  {
-    id: 9,
-    src: "../assets/images/",
-    letter: "J",
-    ext: ".jpg",
-  },
-  {
-    id: 10,
-    src: "../assets/images/",
-    letter: "K",
     ext: ".jpg",
   },
 ];
 
 const App = () => {
   const [cards, setCards] = useState(DUMMY_CARDS);
+
   const [cardDeck, setCardDeck] = useState([]);
   const [score, setScore] = useState(0);
-  const [openCard, setOpenCard] = useState("");
-  const [flipCard, setFlipCard] = useState();
+  const [openCard, setOpenCard] = useState([]);
+  const [foundMatches, setFoundMatches] = useState([]);
+
+  const timer = useRef(null);
 
   const suffleCards = (cards) => {
     const deck = cards.concat(cards);
@@ -90,30 +57,37 @@ const App = () => {
     setScore(0);
   };
 
-  const exChild = (callback) => {
-    callback();
-  };
-
-  const checkTurn = (card, flipMethod) => {
-    if (openCard === "") {
-      setOpenCard(card);
-      setFlipCard(flipMethod);
-      return;
-    } else if (openCard === card) {
-      setScore(score + 1);
-      setOpenCard("");
-      setFlipCard(null);
+  const compareCards = () => {
+    const [firstCard, secondCard] = openCard;
+    if (cardDeck[firstCard].id === cardDeck[secondCard].id) {
+      setOpenCard([]);
+      console.log("Encontradas");
       return;
     } else {
-      exChild(flipMethod);
-      exChild(flipCard);
-      setOpenCard("");
-      setFlipCard(null);
+      timer.current = setTimeout(() => {
+        setOpenCard([]);
+      }, 800);
     }
+  };
 
-    console.log(card);
+  const checkTurn = (card) => {
+    if (openCard.length === 1) {
+      setOpenCard((prev) => [...prev, card]);
+    } else {
+      setOpenCard([card]);
+    }
     console.log(openCard);
   };
+
+  useEffect(() => {
+    let timer = null;
+    if (openCard.length === 2) {
+      timer = setTimeout(compareCards, 500);
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [openCard]);
 
   useEffect(() => {
     suffleCards(cards);
@@ -123,7 +97,7 @@ const App = () => {
   return (
     <div>
       <Nav handleShuffle={suffleCards} cards={cards} score={score} />
-      <Table cards={cardDeck} checkTurn={checkTurn}></Table>
+      <Table cards={cardDeck} handleTurn={checkTurn}></Table>
     </div>
   );
 };
